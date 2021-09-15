@@ -5,6 +5,8 @@ import mainTheme from "./ui/Theme";
 import { SendRounded } from "@material-ui/icons";
 import ChatBubble from "./ChatBubble";
 import ScrollToBottom from "react-scroll-to-bottom";
+import NoMessages from "./NoMessages";
+import { v4 as uuidv4 } from "uuid";
 
 import { Redirect } from "react-router-dom";
 
@@ -26,7 +28,6 @@ const useStyle = makeStyles((theme) => ({
   messageInputContainer: {
     width: "10em",
   },
-  buttonContainer: {},
   messageInput: {
     backgroundColor: "#fff",
     maxWidth: "26em",
@@ -49,12 +50,13 @@ const useStyle = makeStyles((theme) => ({
     borderRadius: "5px",
     marginBottom: "1em",
     backgroundColor: "#fff",
-    padding: "1em 0.5em",
+    padding: "1em 0.5em ",
   },
   autoScroll: {
     width: "100%",
     height: "100%",
     overflow: "hidden",
+    marginLeft: "0.5em",
   },
   inputContainer: {
     width: "26ch",
@@ -77,7 +79,7 @@ const MessageInput = withStyles({
   },
 })(TextField);
 
-export default function MessageContainer({ inputName, socket }) {
+export default function MessageContainer({ inputName, socket, io }) {
   const classes = useStyle();
 
   const [isValidate, setIsValidate] = useState(true);
@@ -93,8 +95,6 @@ export default function MessageContainer({ inputName, socket }) {
     } else {
       setIsValidate(true);
     }
-
-    console.log(messageInput);
   }
 
   const handleSendMessage = async (e) => {
@@ -102,6 +102,7 @@ export default function MessageContainer({ inputName, socket }) {
 
     if (messageInput !== "") {
       const messageData = {
+        id: uuidv4(),
         author: inputName,
         message: messageInput,
       };
@@ -109,7 +110,7 @@ export default function MessageContainer({ inputName, socket }) {
       await socket.emit("send_message", messageData);
       setMessages((prevState) => [...prevState, messageData]);
       setMessageInput("");
-      setIsValidate("false");
+      setIsValidate(false);
     }
   };
 
@@ -145,19 +146,30 @@ export default function MessageContainer({ inputName, socket }) {
               className={classes.chatContent}
               wrap="nowrap"
             >
-              <Grid item className={classes.messages}>
-                <ScrollToBottom className={classes.autoScroll}>
-                  {/* Messages Here */}
-                  {messages.map((data) => {
-                    return (
-                      <ChatBubble
-                        author={data.author}
-                        message={data.message}
-                        username={inputName}
-                      />
-                    );
-                  })}
-                </ScrollToBottom>
+              <Grid
+                item
+                className={classes.messages}
+                container
+                direction="row"
+                alignContent="center"
+              >
+                {messages.length === 0 ? (
+                  <NoMessages />
+                ) : (
+                  <ScrollToBottom className={classes.autoScroll}>
+                    {/* Messages Here */}
+                    {messages.map((data) => {
+                      return (
+                        <ChatBubble
+                          key={data.id}
+                          author={data.author}
+                          message={data.message}
+                          username={inputName}
+                        />
+                      );
+                    })}
+                  </ScrollToBottom>
+                )}
               </Grid>
               <form
                 id="form"

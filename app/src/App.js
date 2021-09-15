@@ -7,7 +7,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import io from "socket.io-client";
 
-const socket = io.connect("http://localhost:3001");
+const socket = io.connect("http://localhost:3001/message");
 
 function App() {
   const [inputName, setInputName] = useState("");
@@ -36,6 +36,7 @@ function App() {
               <MessageContainer
                 inputName={inputName}
                 socket={socket}
+                io={io}
                 username={inputName}
               />
             )}

@@ -3,28 +3,36 @@ import { Grid, makeStyles, Typography, Box } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   chat: {
+    width: "auto",
+    height: "auto",
+    maxWidth: "263px",
     color: "#fff",
     fontWeight: 500,
     fontSize: "1rem",
-    maxWidth: "263px",
     borderRadius: "50px",
     padding: "10px 15px",
+    overflowWrap: "break-word",
+    wordBreak: "break-word",
+  },
+  messageContent: {
+    lineHeight: "1px",
   },
   you: {
     backgroundColor: theme.palette.secondary.main,
     color: theme.palette.common.black,
+    marginRight: "1em",
   },
   other: {
     backgroundColor: theme.palette.primary.main,
   },
   youChatInfo: {
-    marginRight: "1.5em",
+    marginRight: "2em",
   },
   otherChatInfo: {
-    marginLeft: "1.5em",
+    marginLeft: "1em",
   },
   authorName: {
-    color: "#707070",
+    color: theme.palette.grey[600],
   },
 }));
 
@@ -43,11 +51,16 @@ export default function ChatBubble({ author, message, username }) {
           <Box
             className={
               username === author
-                ? [classes.chat, classes.you]
-                : [classes.chat, classes.other]
+                ? `${classes.chat} ${classes.you}`
+                : `${classes.chat} ${classes.other}`
             }
           >
-            <Typography align="left" variant="subtitle1" style={{ margin: 0 }}>
+            <Typography
+              align="left"
+              variant="subtitle1"
+              className={classes.messageContent}
+              display="inline"
+            >
               {message}
             </Typography>
           </Box>
@@ -61,10 +74,11 @@ export default function ChatBubble({ author, message, username }) {
       >
         <Typography
           variant="caption"
+          noWrap
           className={
             username === author
-              ? [classes.authorName, classes.youChatInfo]
-              : [classes.authorName, classes.otherChatInfo]
+              ? `${classes.authorName} ${classes.youChatInfo}`
+              : `${classes.authorName} ${classes.otherChatInfo}`
           }
         >
           {author}

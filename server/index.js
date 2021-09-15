@@ -14,8 +14,10 @@ const io = new Server(server, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("someone connected to the server...");
+io.of("/message").on("connection", (socket) => {
+  const connectedUser = io.of("/message").sockets.size;
+  socket.emit("log_message", { text: "someone connected" });
+
   socket.on("send_message", (data) => {
     socket.broadcast.emit("recieve_message", data);
   });
