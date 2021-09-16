@@ -60,6 +60,8 @@ export default function MainContainer({
   setInputName,
   validate,
   setValidate,
+  invalidName,
+  setInValidName,
   socket,
 }) {
   const classes = useStyles();
@@ -70,14 +72,23 @@ export default function MainContainer({
     setInputName(userInput);
 
     if (userInput !== "") {
-      setValidate(false);
+      if (
+        userInput.toLocaleLowerCase() === "server" ||
+        userInput.toLocaleLowerCase().includes("server")
+      ) {
+        setInValidName(true);
+        setValidate(true);
+      } else {
+        setInValidName(false);
+        setValidate(false);
+      }
     } else {
       setValidate(true);
     }
   }
 
   async function handleButton() {
-    await socket.emit("user_counter", { user: 1 });
+    await socket.emit("user_counter", { user: 1, username: inputName });
   }
 
   return (
@@ -136,6 +147,8 @@ export default function MainContainer({
             style={{ width: "100%" }}
           >
             <TextField
+              error={invalidName}
+              helperText={invalidName ? "Please choose different name." : ""}
               autoComplete="off"
               variant="outlined"
               color="secondary"

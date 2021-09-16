@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
+const { v4: uuidv4 } = require("uuid");
 
 const { Server } = require("socket.io");
 const app = express();
@@ -19,11 +20,22 @@ var userCount = 0;
 io.on("connection", (socket) => {
   socket.on("user_counter", (userNumber) => {
     userCount = userCount + userNumber.user;
+
     io.emit("user_counter", userCount);
+
+    socket.broadcast.emit("new_user", {
+      id: uuidv4(),
+      author: "Server",
+      message: "has joined!",
+      newUser: userNumber.username,
+    });
   });
 
   socket.on("disconnect", () => {
-    userCount--;
+    if (userCount !== 0) {
+      userCount--;
+    }
+
     io.emit("user_counter", userCount);
   });
 

@@ -12,6 +12,7 @@ const socket = io.connect("http://localhost:3001");
 function App() {
   const [inputName, setInputName] = useState("");
   const [validate, setValidate] = useState(true);
+  const [invalidName, setInValidName] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
@@ -26,6 +27,8 @@ function App() {
                 setInputName={setInputName}
                 validate={validate}
                 setValidate={setValidate}
+                invalidName={invalidName}
+                setInValidName={setInValidName}
                 socket={socket}
               />
             )}

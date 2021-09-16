@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
   other: {
     backgroundColor: theme.palette.primary.main,
   },
+  server: {
+    backgroundColor: theme.palette.common.white,
+    color: theme.palette.grey[700],
+  },
   youChatInfo: {
     marginRight: "2em",
   },
@@ -34,9 +38,12 @@ const useStyles = makeStyles((theme) => ({
   authorName: {
     color: theme.palette.grey[600],
   },
+  newUser: {
+    color: theme.palette.primary.light,
+  },
 }));
 
-export default function ChatBubble({ author, message, username }) {
+export default function ChatBubble({ author, message, username, newUser }) {
   const classes = useStyles();
 
   return (
@@ -47,24 +54,40 @@ export default function ChatBubble({ author, message, username }) {
         direction="row"
         justifyContent={username === author ? "flex-end" : "flex-start"}
       >
-        <Grid>
-          <Box
-            className={
-              username === author
-                ? `${classes.chat} ${classes.you}`
-                : `${classes.chat} ${classes.other}`
-            }
-          >
-            <Typography
-              align="left"
-              variant="subtitle1"
-              className={classes.messageContent}
-              display="inline"
+        {author === "Server" ? (
+          <Grid item>
+            <Box className={`${classes.chat} ${classes.server}`}>
+              <Typography
+                align="left"
+                variant="subtitle1"
+                className={classes.messageContent}
+                display="inline"
+              >
+                <i className={classes.newUser}>{newUser} </i>
+                {message}
+              </Typography>
+            </Box>
+          </Grid>
+        ) : (
+          <Grid item>
+            <Box
+              className={
+                username === author
+                  ? `${classes.chat} ${classes.you}`
+                  : `${classes.chat} ${classes.other}`
+              }
             >
-              {message}
-            </Typography>
-          </Box>
-        </Grid>
+              <Typography
+                align="left"
+                variant="subtitle1"
+                className={classes.messageContent}
+                display="inline"
+              >
+                {message}
+              </Typography>
+            </Box>
+          </Grid>
+        )}
       </Grid>
       <Grid
         item

@@ -46,7 +46,7 @@ const useStyle = makeStyles((theme) => ({
   },
   messages: {
     width: "100%",
-    height: "85%",
+    height: "80%",
     borderRadius: "5px",
     marginBottom: "1em",
     backgroundColor: "#fff",
@@ -136,6 +136,12 @@ export default function MessageContainer({ inputName, socket }) {
       }
     });
 
+    socket.on("new_user", (newUserName) => {
+      if (!unmounted) {
+        setMessages((prevState) => [...prevState, newUserName]);
+      }
+    });
+
     return () => {
       unmounted = true;
     };
@@ -199,6 +205,7 @@ export default function MessageContainer({ inputName, socket }) {
                           author={data.author}
                           message={data.message}
                           username={inputName}
+                          newUser={data.newUser}
                         />
                       );
                     })}
