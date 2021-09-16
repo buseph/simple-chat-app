@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
-import { Button, Grid, TextField } from "@material-ui/core";
+import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import mainTheme from "./ui/Theme";
-import { SendRounded } from "@material-ui/icons";
+import { SendRounded, GroupRounded } from "@material-ui/icons";
 import ChatBubble from "./ChatBubble";
 import ScrollToBottom from "react-scroll-to-bottom";
 import NoMessages from "./NoMessages";
@@ -61,6 +61,12 @@ const useStyle = makeStyles((theme) => ({
   inputContainer: {
     width: "26ch",
   },
+  userCount: {
+    fontWeight: 600,
+    marginLeft: "0.2em",
+    marginTop: "1.5px",
+    color: theme.palette.grey[600],
+  },
 }));
 
 const MessageInput = withStyles({
@@ -79,12 +85,13 @@ const MessageInput = withStyles({
   },
 })(TextField);
 
-export default function MessageContainer({ inputName, socket, io }) {
+export default function MessageContainer({ inputName, socket }) {
   const classes = useStyle();
 
   const [isValidate, setIsValidate] = useState(true);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
+  const [userCount, setUserCount] = useState(0);
 
   function handleSendValidation(e) {
     const value = e.target.value;
@@ -110,14 +117,28 @@ export default function MessageContainer({ inputName, socket, io }) {
       await socket.emit("send_message", messageData);
       setMessages((prevState) => [...prevState, messageData]);
       setMessageInput("");
-      setIsValidate(false);
+      setIsValidate(true);
     }
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     socket.on("recieve_message", (data) => {
-      setMessages((prevState) => [...prevState, data]);
+      if (!unmounted) {
+        setMessages((prevState) => [...prevState, data]);
+      }
     });
+
+    socket.on("user_counter", (userNumber) => {
+      if (!unmounted) {
+        setUserCount(userNumber);
+      }
+    });
+
+    return () => {
+      unmounted = true;
+    };
   }, [socket]);
 
   return (
@@ -146,6 +167,19 @@ export default function MessageContainer({ inputName, socket, io }) {
               className={classes.chatContent}
               wrap="nowrap"
             >
+              <Grid
+                item
+                container
+                direction="row"
+                justifyContent="center"
+                alignContent="center"
+              >
+                <GroupRounded color="secondary" />
+                <Typography variant="body1" className={classes.userCount}>
+                  {userCount}
+                </Typography>
+              </Grid>
+
               <Grid
                 item
                 className={classes.messages}

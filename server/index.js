@@ -14,9 +14,18 @@ const io = new Server(server, {
   },
 });
 
-io.of("/message").on("connection", (socket) => {
-  const connectedUser = io.of("/message").sockets.size;
-  socket.emit("log_message", { text: "someone connected" });
+var userCount = 0;
+
+io.on("connection", (socket) => {
+  socket.on("user_counter", (userNumber) => {
+    userCount = userCount + userNumber.user;
+    io.emit("user_counter", userCount);
+  });
+
+  socket.on("disconnect", () => {
+    userCount--;
+    io.emit("user_counter", userCount);
+  });
 
   socket.on("send_message", (data) => {
     socket.broadcast.emit("recieve_message", data);

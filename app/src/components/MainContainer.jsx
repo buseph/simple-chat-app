@@ -60,6 +60,7 @@ export default function MainContainer({
   setInputName,
   validate,
   setValidate,
+  socket,
 }) {
   const classes = useStyles();
   const theme = useTheme();
@@ -73,6 +74,10 @@ export default function MainContainer({
     } else {
       setValidate(true);
     }
+  }
+
+  async function handleButton() {
+    await socket.emit("user_counter", { user: 1 });
   }
 
   return (
@@ -155,6 +160,7 @@ export default function MainContainer({
                 fullWidth
                 className={classes.startButton}
                 disabled={validate}
+                onClick={handleButton}
               >
                 Start Chatting!
               </Button>
