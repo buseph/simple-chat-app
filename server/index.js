@@ -44,6 +44,12 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3001, () => {
+const port = process.env.PORT;
+
+if (port == null || port == "") {
+  port = 3001;
+}
+
+server.listen(port, () => {
   console.log("server running on port 3001");
 });
