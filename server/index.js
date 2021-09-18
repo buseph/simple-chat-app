@@ -56,6 +56,7 @@ io.on("connection", (socket) => {
 
     temp = [];
 
+    io.emit("existing_user", existingUser);
     console.log("updated");
     console.log(existingUser);
   });

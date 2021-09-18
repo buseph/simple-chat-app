@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Typography, Button, TextField, Avatar } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
@@ -68,6 +68,7 @@ export default function MainContainer({
 }) {
   const classes = useStyles();
   const theme = useTheme();
+  const [existingUser, setExistingUser] = useState();
 
   function handleInput(e) {
     const userInput = e.target.value;
@@ -102,8 +103,8 @@ export default function MainContainer({
     let unmounted = false;
 
     socket.on("existing_user", (data) => {
-      console.log(data);
       if (!unmounted) {
+        setExistingUser(data);
       }
     });
 
