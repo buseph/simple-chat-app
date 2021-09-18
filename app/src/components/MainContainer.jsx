@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grid, Typography, Button, TextField, Avatar } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
@@ -97,6 +97,20 @@ export default function MainContainer({
       username: inputName,
     });
   }
+
+  useEffect(() => {
+    let unmounted = false;
+
+    socket.on("existing_user", (data) => {
+      console.log(data);
+      if (!unmounted) {
+      }
+    });
+
+    return () => {
+      unmounted = true;
+    };
+  }, [socket]);
 
   return (
     <Grid

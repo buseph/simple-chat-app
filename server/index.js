@@ -15,6 +15,8 @@ const io = new Server(server, {
   },
 });
 
+var existingUser = [];
+
 io.on("connection", (socket) => {
   socket.on("new_user", (data) => {
     // log message for new user
@@ -24,6 +26,38 @@ io.on("connection", (socket) => {
       message: "has joined!",
       newUser: data.username,
     });
+
+    existingUser.push(data);
+
+    io.emit("existing_user", existingUser);
+    console.log(existingUser);
+  });
+
+  // send to the client the existing user
+  io.emit("existing_user", existingUser);
+  console.log(existingUser);
+
+  socket.on("disconnect", () => {
+    var temp = [];
+
+    existingUser
+      .filter((data) => {
+        return socket.id !== data.socketid;
+      })
+      .map((data) => {
+        existingUser = [];
+        return temp.push(data);
+      });
+
+    console.log(temp);
+    temp.map((data) => {
+      return existingUser.push(data);
+    });
+
+    temp = [];
+
+    console.log("updated");
+    console.log(existingUser);
   });
 
   // sending messages
