@@ -10,7 +10,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://buseph-simplechatapp.netlify.app",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
@@ -44,7 +44,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const port = process.env.PORT;
+var port = process.env.PORT;
 
 if (port == null || port == "") {
   port = 3001;
