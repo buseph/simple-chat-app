@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
         return temp.push(data);
       });
 
-    console.log(temp);
+    // console.log(temp);
     temp.map((data) => {
       return existingUser.push(data);
     });

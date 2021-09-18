@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Grid, Typography, Button, TextField, Avatar } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import _ from "lodash";
 
 import io from "socket.io-client";
 
@@ -64,20 +65,23 @@ export default function MainContainer({
   setValidate,
   invalidName,
   setInValidName,
+  existingName,
+  setExistingName,
+  existingUser,
+  setExistingUser,
   socket,
 }) {
   const classes = useStyles();
   const theme = useTheme();
-  const [existingUser, setExistingUser] = useState();
 
   function handleInput(e) {
     const userInput = e.target.value;
-    setInputName(userInput);
+    setInputName(_.trim(userInput));
 
-    if (userInput !== "") {
+    if (_.trim(userInput) !== "") {
       if (
-        userInput.toLocaleLowerCase() === "server" ||
-        userInput.toLocaleLowerCase().includes("server")
+        _.toLower(userInput) === "server" ||
+        _.toLower(userInput).includes("server")
       ) {
         setInValidName(true);
         setValidate(true);
@@ -95,7 +99,7 @@ export default function MainContainer({
 
     await socket.emit("new_user", {
       socketid: socket.id,
-      username: inputName,
+      username: _.trim(inputName),
     });
   }
 
@@ -111,7 +115,7 @@ export default function MainContainer({
     return () => {
       unmounted = true;
     };
-  }, [socket]);
+  }, [socket, setExistingUser]);
 
   return (
     <Grid
@@ -147,7 +151,7 @@ export default function MainContainer({
               }}
               className={classes.userAvatar}
             >
-              {inputName.slice(0, 1).toLocaleUpperCase()}
+              {_.trim(_.upperCase(inputName)).slice(0, 1)}
             </Avatar>
           </Grid>
           <Grid item>
@@ -169,8 +173,14 @@ export default function MainContainer({
             style={{ width: "100%" }}
           >
             <TextField
-              error={invalidName}
-              helperText={invalidName ? "Please choose different name." : ""}
+              error={invalidName || existingName}
+              helperText={
+                invalidName
+                  ? "Please choose different name"
+                  : existingName
+                  ? "Name already exist"
+                  : ""
+              }
               autoComplete="off"
               variant="outlined"
               color="secondary"
