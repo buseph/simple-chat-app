@@ -15,22 +15,8 @@ const io = new Server(server, {
   },
 });
 
-// var userCount = 0;
-
 io.on("connection", (socket) => {
   socket.on("new_user", (data) => {
-    // userCount = userCount + userNumber.user;
-
-    // io.emit("user_counter", userCount);
-
-    // socket.on("disconnect", () => {
-    //   if (userCount !== 0) {
-    //     userCount--;
-    //   }
-
-    //   io.emit("user_counter", userCount);
-    // });
-
     // log message for new user
     socket.broadcast.emit("new_user", {
       id: uuidv4(),

@@ -90,14 +90,12 @@ export default function MainContainer({
   }
 
   async function handleButton() {
-    const socketMessage = io.connect("http://localhost:3001/message");
+    io.connect("http://localhost:3001/message");
 
     await socket.emit("new_user", {
       socketid: socket.id,
       username: inputName,
     });
-
-    await socketMessage.emit("user_number", "hello");
   }
 
   return (
