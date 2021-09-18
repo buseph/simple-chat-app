@@ -15,32 +15,49 @@ const io = new Server(server, {
   },
 });
 
-var userCount = 0;
+// var userCount = 0;
 
 io.on("connection", (socket) => {
-  socket.on("user_counter", (userNumber) => {
-    userCount = userCount + userNumber.user;
+  socket.on("new_user", (data) => {
+    // userCount = userCount + userNumber.user;
 
-    io.emit("user_counter", userCount);
+    // io.emit("user_counter", userCount);
 
+    // socket.on("disconnect", () => {
+    //   if (userCount !== 0) {
+    //     userCount--;
+    //   }
+
+    //   io.emit("user_counter", userCount);
+    // });
+
+    // log message for new user
     socket.broadcast.emit("new_user", {
       id: uuidv4(),
       author: "Server",
       message: "has joined!",
-      newUser: userNumber.username,
+      newUser: data.username,
     });
   });
 
-  socket.on("disconnect", () => {
-    if (userCount !== 0) {
-      userCount--;
-    }
-
-    io.emit("user_counter", userCount);
-  });
-
+  // sending messages
   socket.on("send_message", (data) => {
     socket.broadcast.emit("recieve_message", data);
+  });
+});
+
+// message namespace
+io.of("/message").on("connection", (socket) => {
+  const userNumber = io.of("/message").sockets.size;
+  console.log("connected user: ", userNumber);
+
+  io.emit("user_counter", userNumber);
+
+  socket.on("disconnect", () => {
+    const userNumber = io.engine.clientsCount;
+    console.log("connected user: ", userNumber);
+
+    io.emit("user_counter", userNumber);
   });
 });
 

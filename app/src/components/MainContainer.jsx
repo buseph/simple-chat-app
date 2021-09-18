@@ -3,6 +3,8 @@ import { Grid, Typography, Button, TextField, Avatar } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 
+import io from "socket.io-client";
+
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
     width: "35em",
@@ -88,7 +90,14 @@ export default function MainContainer({
   }
 
   async function handleButton() {
-    await socket.emit("user_counter", { user: 1, username: inputName });
+    const socketMessage = io.connect("http://localhost:3001/message");
+
+    await socket.emit("new_user", {
+      socketid: socket.id,
+      username: inputName,
+    });
+
+    await socketMessage.emit("user_number", "hello");
   }
 
   return (
