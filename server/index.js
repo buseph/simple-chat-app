@@ -88,5 +88,5 @@ if (port === null || port == "") {
 }
 
 server.listen(port, () => {
-  console.log("server running on port 3001");
+  
 });
