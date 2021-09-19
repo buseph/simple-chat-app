@@ -74,7 +74,7 @@ io.of("/message").on("connection", (socket) => {
   io.emit("user_counter", userNumber);
 
   socket.on("disconnect", () => {
-    const userNumber = io.engine.clientsCount;
+    const userNumber = io.of("/message").sockets.size;
     // console.log("connected user: ", userNumber);
 
     io.emit("user_counter", userNumber);
