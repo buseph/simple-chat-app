@@ -20,7 +20,7 @@ var existingUser = []; //a
 io.on("connection", (socket) => {
   // send to the client the existing user
   io.emit("existing_user", existingUser);
-  console.log("onConnect: ", existingUser);
+  // console.log("onConnect: ", existingUser);
 
   socket.on("new_user", (data) => {
     // log message for new user
@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
     existingUser.push(data);
 
     io.emit("existing_user", existingUser);
-    console.log("Connected: ", existingUser);
+    // console.log("Connected: ", existingUser);
   });
 
   socket.on("disconnect", () => {
@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
     temp = [];
 
     io.emit("existing_user", existingUser);
-    console.log("disconnected: ", existingUser);
+    // console.log("disconnected: ", existingUser);
   });
 
   // sending messages
@@ -69,13 +69,13 @@ io.on("connection", (socket) => {
 // message namespace
 io.of("/message").on("connection", (socket) => {
   const userNumber = io.of("/message").sockets.size;
-  console.log("connected user: ", userNumber);
+  // console.log("connected user: ", userNumber);
 
   io.emit("user_counter", userNumber);
 
   socket.on("disconnect", () => {
     const userNumber = io.engine.clientsCount;
-    console.log("connected user: ", userNumber);
+    // console.log("connected user: ", userNumber);
 
     io.emit("user_counter", userNumber);
   });

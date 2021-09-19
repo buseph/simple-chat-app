@@ -108,7 +108,6 @@ export default function MainContainer({
 
     socket.on("existing_user", (data) => {
       if (!unmounted) {
-        console.log(data);
         setExistingUser(data);
       }
     });
