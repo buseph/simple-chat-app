@@ -117,6 +117,25 @@ export default function MainContainer({
     };
   }, [socket, setExistingUser]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (inputName !== "") {
+        for (var i = 0; i < existingUser.length; i++) {
+          if (_.toLower(existingUser[i].username) === _.toLower(inputName)) {
+            setExistingName(true);
+            setValidate(true);
+            break;
+          } else {
+            setExistingName(false);
+            setValidate(false);
+          }
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [inputName, existingUser, setValidate, setExistingName]);
+
   return (
     <Grid
       container
