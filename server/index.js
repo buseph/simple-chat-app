@@ -15,36 +15,73 @@ const io = new Server(server, {
   },
 });
 
-var userCount = 0;
+var existingUser = []; //a
 
 io.on("connection", (socket) => {
-  socket.on("user_counter", (userNumber) => {
-    userCount = userCount + userNumber.user;
+  // send to the client the existing user
+  io.emit("existing_user", existingUser);
+  // console.log("onConnect: ", existingUser);
 
-    io.emit("user_counter", userCount);
-
+  socket.on("new_user", (data) => {
+    // log message for new user
     socket.broadcast.emit("new_user", {
       id: uuidv4(),
       author: "Server",
       message: "has joined!",
-      newUser: userNumber.username,
+      newUser: data.username,
     });
+
+    existingUser.push(data);
+
+    io.emit("existing_user", existingUser);
+    // console.log("Connected: ", existingUser);
   });
 
   socket.on("disconnect", () => {
-    if (userCount !== 0) {
-      userCount--;
-    }
+    var temp = [];
 
-    io.emit("user_counter", userCount);
+    existingUser
+      .filter((data) => {
+        return socket.id !== data.socketid;
+      })
+      .map((data) => {
+        return temp.push(data);
+      });
+
+    existingUser = [];
+
+    temp.map((data) => {
+      return existingUser.push(data);
+    });
+
+    temp = [];
+
+    io.emit("existing_user", existingUser);
+    // console.log("disconnected: ", existingUser);
   });
 
+  // sending messages
   socket.on("send_message", (data) => {
     socket.broadcast.emit("recieve_message", data);
   });
 });
 
-const port = process.env.PORT;
+// message namespace
+io.of("/message").on("connection", (socket) => {
+  const userNumber = io.of("/message").sockets.size;
+  // console.log("connected user: ", userNumber);
+
+  io.emit("user_counter", userNumber);
+
+  socket.on("disconnect", () => {
+    const userNumber = io.of("/message").sockets.size;
+    // console.log("connected user: ", userNumber);
+
+    io.emit("user_counter", userNumber);
+  });
+});
+
+var port = process.env.PORT;
 
 if (port == null || port == "") {
   port = 3001;

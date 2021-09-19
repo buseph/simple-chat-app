@@ -13,6 +13,8 @@ function App() {
   const [inputName, setInputName] = useState("");
   const [validate, setValidate] = useState(true);
   const [invalidName, setInValidName] = useState(false);
+  const [existingName, setExistingName] = useState(false);
+  const [existingUser, setExistingUser] = useState([]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -29,6 +31,10 @@ function App() {
                 setValidate={setValidate}
                 invalidName={invalidName}
                 setInValidName={setInValidName}
+                existingName={existingName}
+                existingUser={existingUser}
+                setExistingUser={setExistingUser}
+                setExistingName={setExistingName}
                 socket={socket}
               />
             )}

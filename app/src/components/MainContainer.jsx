@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grid, Typography, Button, TextField, Avatar } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import _ from "lodash";
+
+import io from "socket.io-client";
 
 const useStyles = makeStyles((theme) => ({
   chatContainer: {
@@ -62,6 +65,10 @@ export default function MainContainer({
   setValidate,
   invalidName,
   setInValidName,
+  existingName,
+  setExistingName,
+  existingUser,
+  setExistingUser,
   socket,
 }) {
   const classes = useStyles();
@@ -69,12 +76,12 @@ export default function MainContainer({
 
   function handleInput(e) {
     const userInput = e.target.value;
-    setInputName(userInput);
+    setInputName(_.trim(userInput));
 
-    if (userInput !== "") {
+    if (_.trim(userInput) !== "") {
       if (
-        userInput.toLocaleLowerCase() === "server" ||
-        userInput.toLocaleLowerCase().includes("server")
+        _.toLower(userInput) === "server" ||
+        _.toLower(userInput).includes("server")
       ) {
         setInValidName(true);
         setValidate(true);
@@ -88,8 +95,48 @@ export default function MainContainer({
   }
 
   async function handleButton() {
-    await socket.emit("user_counter", { user: 1, username: inputName });
+    io.connect("https://jsph-chat-app-server.herokuapp.com/message");
+
+    await socket.emit("new_user", {
+      socketid: socket.id,
+      username: _.trim(inputName),
+    });
   }
+
+  useEffect(() => {
+    let unmounted = false;
+
+    socket.on("existing_user", (data) => {
+      if (!unmounted) {
+        setExistingUser(data);
+      }
+    });
+
+    return () => {
+      unmounted = true;
+    };
+  }, [socket, setExistingUser]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (inputName !== "") {
+        for (var i = 0; i < existingUser.length; i++) {
+          if (_.toLower(existingUser[i].username) === _.toLower(inputName)) {
+            setExistingName(true);
+            setValidate(true);
+            break;
+          } else {
+            if (!invalidName) {
+              setExistingName(false);
+              setValidate(false);
+            }
+          }
+        }
+      }
+    }, 1);
+
+    return () => clearTimeout(timeoutId);
+  }, [inputName, existingUser, setValidate, setExistingName, invalidName]);
 
   return (
     <Grid
@@ -125,7 +172,7 @@ export default function MainContainer({
               }}
               className={classes.userAvatar}
             >
-              {inputName.slice(0, 1).toLocaleUpperCase()}
+              {_.trim(_.upperCase(inputName)).slice(0, 1)}
             </Avatar>
           </Grid>
           <Grid item>
@@ -147,8 +194,14 @@ export default function MainContainer({
             style={{ width: "100%" }}
           >
             <TextField
-              error={invalidName}
-              helperText={invalidName ? "Please choose different name." : ""}
+              error={invalidName || existingName}
+              helperText={
+                invalidName
+                  ? "Please choose different name"
+                  : existingName
+                  ? "Name already exist"
+                  : ""
+              }
               autoComplete="off"
               variant="outlined"
               color="secondary"
