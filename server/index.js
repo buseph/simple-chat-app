@@ -15,9 +15,13 @@ const io = new Server(server, {
   },
 });
 
-var existingUser = [];
+var existingUser = []; //a
 
 io.on("connection", (socket) => {
+  // send to the client the existing user
+  io.emit("existing_user", existingUser);
+  console.log("onConnect: ", existingUser);
+
   socket.on("new_user", (data) => {
     // log message for new user
     socket.broadcast.emit("new_user", {
@@ -30,12 +34,8 @@ io.on("connection", (socket) => {
     existingUser.push(data);
 
     io.emit("existing_user", existingUser);
-    console.log(existingUser);
+    console.log("Connected: ", existingUser);
   });
-
-  // send to the client the existing user
-  io.emit("existing_user", existingUser);
-  console.log(existingUser);
 
   socket.on("disconnect", () => {
     var temp = [];
@@ -45,11 +45,11 @@ io.on("connection", (socket) => {
         return socket.id !== data.socketid;
       })
       .map((data) => {
-        existingUser = [];
         return temp.push(data);
       });
 
-    // console.log(temp);
+    existingUser = [];
+
     temp.map((data) => {
       return existingUser.push(data);
     });
@@ -57,8 +57,7 @@ io.on("connection", (socket) => {
     temp = [];
 
     io.emit("existing_user", existingUser);
-    console.log("updated");
-    console.log(existingUser);
+    console.log("disconnected: ", existingUser);
   });
 
   // sending messages

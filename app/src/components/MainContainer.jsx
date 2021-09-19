@@ -108,6 +108,7 @@ export default function MainContainer({
 
     socket.on("existing_user", (data) => {
       if (!unmounted) {
+        console.log(data);
         setExistingUser(data);
       }
     });
@@ -126,15 +127,17 @@ export default function MainContainer({
             setValidate(true);
             break;
           } else {
-            setExistingName(false);
-            setValidate(false);
+            if (!invalidName) {
+              setExistingName(false);
+              setValidate(false);
+            }
           }
         }
       }
-    }, 500);
+    }, 1);
 
     return () => clearTimeout(timeoutId);
-  }, [inputName, existingUser, setValidate, setExistingName]);
+  }, [inputName, existingUser, setValidate, setExistingName, invalidName]);
 
   return (
     <Grid
