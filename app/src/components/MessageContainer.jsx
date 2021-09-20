@@ -191,18 +191,20 @@ export default function MessageContainer({ inputName, socket }) {
               className={classes.chatContent}
               wrap="nowrap"
             >
-              <Grid
-                item
-                container
-                direction="row"
-                justifyContent="center"
-                alignContent="center"
-              >
-                <GroupRounded color="secondary" />
-                <Typography variant="body1" className={classes.userCount}>
-                  {userCount}
-                </Typography>
-              </Grid>
+              <Tooltip title="online" placement="bottom" arrow>
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignContent="center"
+                >
+                  <GroupRounded color="secondary" />
+                  <Typography variant="body1" className={classes.userCount}>
+                    {userCount}
+                  </Typography>
+                </Grid>
+              </Tooltip>
 
               <Grid
                 item

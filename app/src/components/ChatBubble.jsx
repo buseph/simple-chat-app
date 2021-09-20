@@ -88,7 +88,11 @@ export default function ChatBubble({
           </Grid>
         ) : (
           <Grid item>
-            <Tooltip title={time} placement="left" arrow>
+            <Tooltip
+              title={time}
+              placement={username === author ? "left" : "right"}
+              arrow
+            >
               <Box
                 className={
                   username === author
