@@ -95,7 +95,7 @@ export default function MainContainer({
   }
 
   async function handleButton() {
-    io.connect("https://jsph-chat-app-server.herokuapp.com/message");
+    io.connect("http://localhost:3000/message");
 
     await socket.emit("new_user", {
       socketid: socket.id,
