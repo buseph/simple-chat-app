@@ -257,21 +257,19 @@ export default function MessageContainer({ inputName, socket }) {
                     autoFocus
                     fullWidth
                   />
-                  <Grid item className={classes.buttonContainer}>
-                    <Tooltip title="send" arrow>
-                      <span>
-                        <Button
-                          variant="contained"
-                          className={classes.sendButton}
-                          disableElevation
-                          disabled={isValidate}
-                          onClick={handleSendMessage}
-                        >
-                          <SendRounded fontSize="large" />
-                        </Button>
-                      </span>
-                    </Tooltip>
-                  </Grid>
+                  <Tooltip title="send" placement="top" arrow>
+                    <Grid item className={classes.buttonContainer}>
+                      <Button
+                        variant="contained"
+                        className={classes.sendButton}
+                        disableElevation
+                        disabled={isValidate}
+                        onClick={handleSendMessage}
+                      >
+                        <SendRounded fontSize="large" />
+                      </Button>
+                    </Grid>
+                  </Tooltip>
                 </Grid>
               </form>
             </Grid>
