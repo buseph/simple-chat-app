@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, makeStyles, Typography, Box } from "@material-ui/core";
+import { Grid, makeStyles, Typography, Box, Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   chat: {
@@ -46,7 +46,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ChatBubble({ author, message, username, newUser, id }) {
+export default function ChatBubble({
+  author,
+  message,
+  username,
+  newUser,
+  id,
+  time,
+}) {
   const classes = useStyles();
 
   return (
@@ -59,40 +66,46 @@ export default function ChatBubble({ author, message, username, newUser, id }) {
       >
         {author === "Server" ? (
           <Grid item>
-            <Box className={`${classes.chat} ${classes.server}`}>
-              <Typography
-                align="left"
-                variant="subtitle1"
-                className={classes.messageContent}
-                display="inline"
-              >
-                <i
-                  className={id === "left" ? classes.leftUser : classes.newUser}
+            <Tooltip title={time} placement="right" arrow>
+              <Box className={`${classes.chat} ${classes.server}`}>
+                <Typography
+                  align="left"
+                  variant="subtitle1"
+                  className={classes.messageContent}
+                  display="inline"
                 >
-                  {newUser}{" "}
-                </i>
-                {message}
-              </Typography>
-            </Box>
+                  <i
+                    className={
+                      id === "left" ? classes.leftUser : classes.newUser
+                    }
+                  >
+                    {newUser}{" "}
+                  </i>
+                  {message}
+                </Typography>
+              </Box>
+            </Tooltip>
           </Grid>
         ) : (
           <Grid item>
-            <Box
-              className={
-                username === author
-                  ? `${classes.chat} ${classes.you}`
-                  : `${classes.chat} ${classes.other}`
-              }
-            >
-              <Typography
-                align="left"
-                variant="subtitle1"
-                className={classes.messageContent}
-                display="inline"
+            <Tooltip title={time} placement="left" arrow>
+              <Box
+                className={
+                  username === author
+                    ? `${classes.chat} ${classes.you}`
+                    : `${classes.chat} ${classes.other}`
+                }
               >
-                {message}
-              </Typography>
-            </Box>
+                <Typography
+                  align="left"
+                  variant="subtitle1"
+                  className={classes.messageContent}
+                  display="inline"
+                >
+                  {message}
+                </Typography>
+              </Box>
+            </Tooltip>
           </Grid>
         )}
       </Grid>

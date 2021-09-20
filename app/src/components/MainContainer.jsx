@@ -76,7 +76,7 @@ export default function MainContainer({
 
   function handleInput(e) {
     const userInput = e.target.value;
-    setInputName(_.trim(userInput));
+    setInputName(_.upperFirst(_.trim(userInput).slice(0, 9)));
 
     if (_.trim(userInput) !== "") {
       if (
@@ -99,7 +99,7 @@ export default function MainContainer({
 
     await socket.emit("new_user", {
       socketid: socket.id,
-      username: _.trim(inputName),
+      username: inputName,
     });
   }
 

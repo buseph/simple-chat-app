@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
-import { Button, Grid, TextField, Typography } from "@material-ui/core";
+import {
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  Tooltip,
+} from "@material-ui/core";
 import mainTheme from "./ui/Theme";
 import { SendRounded, GroupRounded } from "@material-ui/icons";
 import ChatBubble from "./ChatBubble";
@@ -107,11 +113,16 @@ export default function MessageContainer({ inputName, socket }) {
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
+    const currentTime = new Date().getHours() + ":" + new Date().getMinutes();
+
+    console.log(currentTime);
+
     if (messageInput !== "") {
       const messageData = {
         id: uuidv4(),
         author: inputName,
         message: messageInput,
+        time: currentTime,
       };
 
       await socket.emit("send_message", messageData);
@@ -214,6 +225,7 @@ export default function MessageContainer({ inputName, socket }) {
                           username={inputName}
                           newUser={data.newUser}
                           id={data.id}
+                          time={data.time}
                         />
                       );
                     })}
@@ -244,15 +256,19 @@ export default function MessageContainer({ inputName, socket }) {
                     fullWidth
                   />
                   <Grid item className={classes.buttonContainer}>
-                    <Button
-                      variant="contained"
-                      className={classes.sendButton}
-                      disableElevation
-                      disabled={isValidate}
-                      onClick={handleSendMessage}
-                    >
-                      <SendRounded fontSize="large" />
-                    </Button>
+                    <Tooltip title="send" arrow>
+                      <span>
+                        <Button
+                          variant="contained"
+                          className={classes.sendButton}
+                          disableElevation
+                          disabled={isValidate}
+                          onClick={handleSendMessage}
+                        >
+                          <SendRounded fontSize="large" />
+                        </Button>
+                      </span>
+                    </Tooltip>
                   </Grid>
                 </Grid>
               </form>

@@ -15,7 +15,9 @@ const io = new Server(server, {
   },
 });
 
-var existingUser = []; //a
+var existingUser = [];
+
+const currentTime = new Date().getHours() + ":" + new Date().getMinutes();
 
 io.on("connection", (socket) => {
   // send to the client the existing user
@@ -29,6 +31,7 @@ io.on("connection", (socket) => {
       author: "Server",
       message: "has joined! 👋",
       newUser: data.username,
+      time: currentTime,
     });
 
     existingUser.push(data);
@@ -45,11 +48,10 @@ io.on("connection", (socket) => {
           author: "Server",
           message: "has left! 🚪🏃💨",
           newUser: data.username,
+          time: currentTime,
         });
       }
     });
-
-    // console.log(disconnectedUser);
 
     // remove the user that disconnect in existingUser array
     var temp = [];
