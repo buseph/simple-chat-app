@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("new_user", {
       id: uuidv4(),
       author: "Server",
-      message: "has joined!",
+      message: "has joined! 👋",
       newUser: data.username,
     });
 
@@ -38,8 +38,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    var temp = [];
+    existingUser.filter((data) => {
+      if (data.socketid === socket.id) {
+        return socket.broadcast.emit("new_user", {
+          id: "left",
+          author: "Server",
+          message: "has left! 🚪🏃💨",
+          newUser: data.username,
+        });
+      }
+    });
 
+    // console.log(disconnectedUser);
+
+    // remove the user that disconnect in existingUser array
+    var temp = [];
     existingUser
       .filter((data) => {
         return socket.id !== data.socketid;
@@ -77,16 +90,21 @@ io.of("/message").on("connection", (socket) => {
     const userNumber = io.of("/message").sockets.size;
     // console.log("connected user: ", userNumber);
 
+    // remove existing user if the connected user is
+    if (userNumber === 0) {
+      existingUser = [];
+    }
+
     io.emit("user_counter", userNumber);
   });
 });
 
 var port = process.env.PORT;
 
-if (port === null || port === "") {
+if (port == null || port == "") {
   port = 3001;
 }
 
 server.listen(port, () => {
-  console.log("server running on port 3001");
+  console.log(`Server running on port ${port}`);
 });

@@ -38,7 +38,7 @@ function App() {
                 socket={socket}
               />
             )}
-          ></Route>
+          />
           <Route
             exact
             path="/message"
@@ -50,7 +50,7 @@ function App() {
                 username={inputName}
               />
             )}
-          ></Route>
+          />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>

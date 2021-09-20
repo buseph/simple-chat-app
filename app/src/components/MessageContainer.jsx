@@ -142,6 +142,13 @@ export default function MessageContainer({ inputName, socket }) {
       }
     });
 
+    socket.on("disconnected_user", (data) => {
+      console.log(data);
+      if (!unmounted) {
+        // setMessages((prevState) => [...prevState, newUserName]);
+      }
+    });
+
     return () => {
       unmounted = true;
     };
@@ -206,6 +213,7 @@ export default function MessageContainer({ inputName, socket }) {
                           message={data.message}
                           username={inputName}
                           newUser={data.newUser}
+                          id={data.id}
                         />
                       );
                     })}

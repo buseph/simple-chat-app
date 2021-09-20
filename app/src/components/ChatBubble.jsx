@@ -41,9 +41,12 @@ const useStyles = makeStyles((theme) => ({
   newUser: {
     color: theme.palette.primary.light,
   },
+  leftUser: {
+    color: theme.palette.common.red,
+  },
 }));
 
-export default function ChatBubble({ author, message, username, newUser }) {
+export default function ChatBubble({ author, message, username, newUser, id }) {
   const classes = useStyles();
 
   return (
@@ -63,7 +66,11 @@ export default function ChatBubble({ author, message, username, newUser }) {
                 className={classes.messageContent}
                 display="inline"
               >
-                <i className={classes.newUser}>{newUser} </i>
+                <i
+                  className={id === "left" ? classes.leftUser : classes.newUser}
+                >
+                  {newUser}{" "}
+                </i>
                 {message}
               </Typography>
             </Box>
@@ -104,7 +111,7 @@ export default function ChatBubble({ author, message, username, newUser }) {
               : `${classes.authorName} ${classes.otherChatInfo}`
           }
         >
-          {author}
+          {author === "Server" ? "💠 Server" : author}
         </Typography>
       </Grid>
     </Grid>

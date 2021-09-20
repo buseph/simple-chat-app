@@ -95,7 +95,7 @@ export default function MainContainer({
   }
 
   async function handleButton() {
-    io.connect("http://localhost:3000/message");
+    io.connect("http://localhost:3001/message");
 
     await socket.emit("new_user", {
       socketid: socket.id,
