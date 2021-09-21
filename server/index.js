@@ -79,6 +79,11 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     socket.broadcast.emit("recieve_message", data);
   });
+
+  //typing event
+  socket.on("someone_typing", (data) => {
+    socket.broadcast.emit("someone_typing", data);
+  });
 });
 
 // message namespace
