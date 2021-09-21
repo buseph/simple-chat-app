@@ -10,12 +10,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://buseph-simplechatapp.netlify.app",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
 
-var existingUser = []; //a
+var existingUser = [];
+
+const currentTime = new Date().getHours() + ":" + new Date().getMinutes();
 
 io.on("connection", (socket) => {
   // send to the client the existing user
@@ -27,8 +29,9 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("new_user", {
       id: uuidv4(),
       author: "Server",
-      message: "has joined!",
+      message: "has joined! 👋",
       newUser: data.username,
+      time: currentTime,
     });
 
     existingUser.push(data);
@@ -38,8 +41,20 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    var temp = [];
+    existingUser.filter((data) => {
+      if (data.socketid === socket.id) {
+        return socket.broadcast.emit("new_user", {
+          id: "left",
+          author: "Server",
+          message: "has left! 🚪🏃💨",
+          newUser: data.username,
+          time: currentTime,
+        });
+      }
+    });
 
+    // remove the user that disconnect in existingUser array
+    var temp = [];
     existingUser
       .filter((data) => {
         return socket.id !== data.socketid;
@@ -64,6 +79,11 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     socket.broadcast.emit("recieve_message", data);
   });
+
+  //typing event
+  socket.on("someone_typing", (data) => {
+    socket.broadcast.emit("someone_typing", data);
+  });
 });
 
 // message namespace
@@ -77,6 +97,11 @@ io.of("/message").on("connection", (socket) => {
     const userNumber = io.of("/message").sockets.size;
     // console.log("connected user: ", userNumber);
 
+    // remove existing user if the connected user is
+    if (userNumber === 0) {
+      existingUser = [];
+    }
+
     io.emit("user_counter", userNumber);
   });
 });
@@ -88,5 +113,5 @@ if (port == null || port == "") {
 }
 
 server.listen(port, () => {
-  console.log("server running on port 3001");
+  console.log(`Server running on port ${port}`);
 });

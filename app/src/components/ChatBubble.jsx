@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, makeStyles, Typography, Box } from "@material-ui/core";
+import { Grid, makeStyles, Typography, Box, Tooltip } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   chat: {
@@ -41,9 +41,19 @@ const useStyles = makeStyles((theme) => ({
   newUser: {
     color: theme.palette.primary.light,
   },
+  leftUser: {
+    color: theme.palette.common.red,
+  },
 }));
 
-export default function ChatBubble({ author, message, username, newUser }) {
+export default function ChatBubble({
+  author,
+  message,
+  username,
+  newUser,
+  id,
+  time,
+}) {
   const classes = useStyles();
 
   return (
@@ -56,36 +66,50 @@ export default function ChatBubble({ author, message, username, newUser }) {
       >
         {author === "Server" ? (
           <Grid item>
-            <Box className={`${classes.chat} ${classes.server}`}>
-              <Typography
-                align="left"
-                variant="subtitle1"
-                className={classes.messageContent}
-                display="inline"
-              >
-                <i className={classes.newUser}>{newUser} </i>
-                {message}
-              </Typography>
-            </Box>
+            <Tooltip title={time} placement="right" arrow>
+              <Box className={`${classes.chat} ${classes.server}`}>
+                <Typography
+                  align="left"
+                  variant="subtitle1"
+                  className={classes.messageContent}
+                  display="inline"
+                >
+                  <i
+                    className={
+                      id === "left" ? classes.leftUser : classes.newUser
+                    }
+                  >
+                    {newUser}{" "}
+                  </i>
+                  {message}
+                </Typography>
+              </Box>
+            </Tooltip>
           </Grid>
         ) : (
           <Grid item>
-            <Box
-              className={
-                username === author
-                  ? `${classes.chat} ${classes.you}`
-                  : `${classes.chat} ${classes.other}`
-              }
+            <Tooltip
+              title={time}
+              placement={username === author ? "left" : "right"}
+              arrow
             >
-              <Typography
-                align="left"
-                variant="subtitle1"
-                className={classes.messageContent}
-                display="inline"
+              <Box
+                className={
+                  username === author
+                    ? `${classes.chat} ${classes.you}`
+                    : `${classes.chat} ${classes.other}`
+                }
               >
-                {message}
-              </Typography>
-            </Box>
+                <Typography
+                  align="left"
+                  variant="subtitle1"
+                  className={classes.messageContent}
+                  display="inline"
+                >
+                  {message}
+                </Typography>
+              </Box>
+            </Tooltip>
           </Grid>
         )}
       </Grid>
@@ -104,7 +128,7 @@ export default function ChatBubble({ author, message, username, newUser }) {
               : `${classes.authorName} ${classes.otherChatInfo}`
           }
         >
-          {author}
+          {author === "Server" ? "💠 Server" : author}
         </Typography>
       </Grid>
     </Grid>

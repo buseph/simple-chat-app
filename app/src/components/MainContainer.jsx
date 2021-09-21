@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
-import { Grid, Typography, Button, TextField, Avatar } from "@material-ui/core";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import {
+  Grid,
+  Typography,
+  Button,
+  TextField,
+  Avatar,
+  useTheme,
+  makeStyles,
+} from "@material-ui/core";
 import { Link } from "react-router-dom";
 import _ from "lodash";
 
@@ -76,7 +83,7 @@ export default function MainContainer({
 
   function handleInput(e) {
     const userInput = e.target.value;
-    setInputName(_.trim(userInput));
+    setInputName(_.upperFirst(_.trim(userInput).slice(0, 9)));
 
     if (_.trim(userInput) !== "") {
       if (
@@ -95,11 +102,11 @@ export default function MainContainer({
   }
 
   async function handleButton() {
-    io.connect("https://jsph-chat-app-server.herokuapp.com/message");
+    io.connect("http://localhost:3001/message");
 
     await socket.emit("new_user", {
       socketid: socket.id,
-      username: _.trim(inputName),
+      username: inputName,
     });
   }
 

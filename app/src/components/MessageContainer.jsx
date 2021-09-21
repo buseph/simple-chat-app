@@ -1,12 +1,24 @@
 import { useEffect, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
-import { Button, Grid, TextField, Typography } from "@material-ui/core";
+import {
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  Tooltip,
+  Avatar,
+  Chip,
+  Grow,
+} from "@material-ui/core";
 import mainTheme from "./ui/Theme";
 import { SendRounded, GroupRounded } from "@material-ui/icons";
 import ChatBubble from "./ChatBubble";
 import ScrollToBottom from "react-scroll-to-bottom";
 import NoMessages from "./NoMessages";
 import { v4 as uuidv4 } from "uuid";
+import _ from "lodash";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import Loader from "react-loader-spinner";
 
 import { Redirect } from "react-router-dom";
 
@@ -67,6 +79,20 @@ const useStyle = makeStyles((theme) => ({
     marginTop: "1.5px",
     color: theme.palette.grey[600],
   },
+  typingContainer: {
+    position: "absolute",
+    bottom: "0.5em",
+  },
+  typingAvatar: {
+    width: "30px",
+    height: "30px",
+    backgroundColor: theme.palette.primary.light,
+    boxShadow: theme.shadows[3],
+  },
+  typingAnimation: {
+    marginLeft: "0.5em",
+    boxShadow: theme.shadows[3],
+  },
 }));
 
 const MessageInput = withStyles({
@@ -92,12 +118,29 @@ export default function MessageContainer({ inputName, socket }) {
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [userCount, setUserCount] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
 
-  function handleSendValidation(e) {
+  const [someoneTyping, setSomeoneTyping] = useState({
+    name: "",
+    typing: false,
+  });
+
+  const typerName = someoneTyping.name;
+  const typing = someoneTyping.typing;
+
+  async function handleSendValidation(e) {
     const value = e.target.value;
     setMessageInput(value);
+    setIsTyping(true);
 
-    if (value !== "") {
+    if (isTyping) {
+      await socket.emit("someone_typing", { name: inputName, typing: true });
+    }
+
+    if (!isTyping) {
+    }
+
+    if (_.trim(value) !== "") {
       setIsValidate(false);
     } else {
       setIsValidate(true);
@@ -107,13 +150,17 @@ export default function MessageContainer({ inputName, socket }) {
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
-    if (messageInput !== "") {
+    const currentTime = new Date().getHours() + ":" + new Date().getMinutes();
+
+    if (_.trim(messageInput) !== "") {
       const messageData = {
         id: uuidv4(),
         author: inputName,
         message: messageInput,
+        time: currentTime,
       };
 
+      await socket.emit("someone_typing", { name: "", typing: false });
       await socket.emit("send_message", messageData);
       setMessages((prevState) => [...prevState, messageData]);
       setMessageInput("");
@@ -142,10 +189,25 @@ export default function MessageContainer({ inputName, socket }) {
       }
     });
 
+    socket.on("someone_typing", (data) => {
+      if (!unmounted) {
+        setSomeoneTyping(data);
+      }
+    });
+
     return () => {
       unmounted = true;
     };
   }, [socket]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsTyping(false);
+      socket.emit("someone_typing", { name: "", typing: false });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [messageInput, socket]);
 
   return (
     <>
@@ -173,18 +235,20 @@ export default function MessageContainer({ inputName, socket }) {
               className={classes.chatContent}
               wrap="nowrap"
             >
-              <Grid
-                item
-                container
-                direction="row"
-                justifyContent="center"
-                alignContent="center"
-              >
-                <GroupRounded color="secondary" />
-                <Typography variant="body1" className={classes.userCount}>
-                  {userCount}
-                </Typography>
-              </Grid>
+              <Tooltip title="online" placement="bottom" arrow>
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignContent="center"
+                >
+                  <GroupRounded color="secondary" />
+                  <Typography variant="body1" className={classes.userCount}>
+                    {userCount}
+                  </Typography>
+                </Grid>
+              </Tooltip>
 
               <Grid
                 item
@@ -192,6 +256,7 @@ export default function MessageContainer({ inputName, socket }) {
                 container
                 direction="row"
                 alignContent="center"
+                style={{ position: "relative" }}
               >
                 {messages.length === 0 ? (
                   <NoMessages />
@@ -206,10 +271,41 @@ export default function MessageContainer({ inputName, socket }) {
                           message={data.message}
                           username={inputName}
                           newUser={data.newUser}
+                          id={data.id}
+                          time={data.time}
                         />
                       );
                     })}
                   </ScrollToBottom>
+                )}
+
+                {/* Typing content */}
+                {typing && (
+                  <Grow in={typing}>
+                    <Grid
+                      container
+                      direction="row"
+                      className={classes.typingContainer}
+                    >
+                      <Grid item>
+                        <Avatar className={classes.typingAvatar}>
+                          {typerName.slice(0, 1)}
+                        </Avatar>
+                      </Grid>
+                      <Chip
+                        label={
+                          <Loader
+                            type="ThreeDots"
+                            color="#00BFFF"
+                            height={30}
+                            width={30}
+                            timeout={0}
+                          />
+                        }
+                        className={classes.typingAnimation}
+                      ></Chip>
+                    </Grid>
+                  </Grow>
                 )}
               </Grid>
               <form
@@ -235,17 +331,19 @@ export default function MessageContainer({ inputName, socket }) {
                     autoFocus
                     fullWidth
                   />
-                  <Grid item className={classes.buttonContainer}>
-                    <Button
-                      variant="contained"
-                      className={classes.sendButton}
-                      disableElevation
-                      disabled={isValidate}
-                      onClick={handleSendMessage}
-                    >
-                      <SendRounded fontSize="large" />
-                    </Button>
-                  </Grid>
+                  <Tooltip title="send" placement="top" arrow>
+                    <Grid item className={classes.buttonContainer}>
+                      <Button
+                        variant="contained"
+                        className={classes.sendButton}
+                        disableElevation
+                        disabled={isValidate}
+                        onClick={handleSendMessage}
+                      >
+                        <SendRounded fontSize="large" />
+                      </Button>
+                    </Grid>
+                  </Tooltip>
                 </Grid>
               </form>
             </Grid>

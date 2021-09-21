@@ -7,7 +7,7 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import io from "socket.io-client";
 
-const socket = io.connect("https://jsph-chat-app-server.herokuapp.com");
+const socket = io.connect("http://localhost:3001");
 
 function App() {
   const [inputName, setInputName] = useState("");
@@ -38,7 +38,7 @@ function App() {
                 socket={socket}
               />
             )}
-          ></Route>
+          />
           <Route
             exact
             path="/message"
@@ -50,7 +50,7 @@ function App() {
                 username={inputName}
               />
             )}
-          ></Route>
+          />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
